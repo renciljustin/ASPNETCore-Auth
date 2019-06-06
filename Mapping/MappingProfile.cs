@@ -1,8 +1,8 @@
-using AuthDemo.Data.Dtos;
-using AuthDemo.Data.Models;
+using API.Data.Dtos;
+using API.Data.Models;
 using AutoMapper;
 
-namespace AuthDemo.Mapping
+namespace API.Mapping
 {
     public class MappingProfile : Profile
     {

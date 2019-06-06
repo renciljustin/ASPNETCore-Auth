@@ -1,4 +1,4 @@
-namespace AuthDemo.Shared
+namespace API.Shared
 {
     public static class RouteText
     {

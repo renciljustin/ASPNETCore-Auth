@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AuthDemo.Core;
-using AuthDemo.Data;
-using AuthDemo.Data.Models;
-using AuthDemo.Data.Seeds;
-using AuthDemo.Shared;
+using API.Core;
+using API.Data;
+using API.Data.Models;
+using API.Data.Seeds;
+using API.Shared;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthDemo
+namespace API
 {
     public class Startup
     {

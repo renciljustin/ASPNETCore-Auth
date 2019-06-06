@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AuthDemo.Core;
-using AuthDemo.Data.Models;
+using API.Core;
+using API.Data.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace AuthDemo.Data
+namespace API.Data
 {
     public class AccountRepository : IAccountRepository
     {

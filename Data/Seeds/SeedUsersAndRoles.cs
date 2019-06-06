@@ -1,9 +1,9 @@
 using System;
-using AuthDemo.Data.Models;
-using AuthDemo.Shared;
+using API.Data.Models;
+using API.Shared;
 using Microsoft.AspNetCore.Identity;
 
-namespace AuthDemo.Data.Seeds
+namespace API.Data.Seeds
 {
     public class SeedUsersAndRoles
     {

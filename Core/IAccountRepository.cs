@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AuthDemo.Data.Models;
+using API.Data.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace AuthDemo.Core
+namespace API.Core
 {
     public interface IAccountRepository
     {

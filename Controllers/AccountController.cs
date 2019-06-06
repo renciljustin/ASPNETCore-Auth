@@ -5,17 +5,17 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using AuthDemo.Core;
-using AuthDemo.Data.Dtos;
-using AuthDemo.Data.Models;
-using AuthDemo.Shared;
+using API.Core;
+using API.Data.Dtos;
+using API.Data.Models;
+using API.Shared;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthDemo.Controllers
+namespace API.Controllers
 {
     [ApiController]
     [Route(RouteText.API)]

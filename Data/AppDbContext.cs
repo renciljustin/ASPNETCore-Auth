@@ -1,8 +1,8 @@
-using AuthDemo.Data.Models;
+using API.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuthDemo.Data
+namespace API.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {

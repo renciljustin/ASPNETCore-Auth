@@ -1,6 +1,6 @@
 using System;
 
-namespace AuthDemo.Data.Dtos
+namespace API.Data.Dtos
 {
     public class UserDetailDto
     {

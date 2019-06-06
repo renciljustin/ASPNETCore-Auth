@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace AuthDemo.Migrations
+namespace API.Migrations
 {
     public partial class CreateIdentity : Migration
     {
