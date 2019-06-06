@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AuthDemo.Core;
 using AuthDemo.Data.Dtos;
 using AuthDemo.Data.Models;
 using AuthDemo.Shared;
@@ -22,71 +23,29 @@ namespace AuthDemo.Controllers
     {
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signinManager;
+        private readonly IAccountRepository _repo;
 
         public AccountController(IConfiguration config,
-            IMapper mapper,
-            UserManager<User> userManager,
-            SignInManager<User> signinManager)
+            IAccountRepository repo,
+            IMapper mapper)
         {
-            _userManager = userManager;
-            _signinManager = signinManager;
+            _repo = repo;
             _config = config;
             _mapper = mapper;
-        }
-
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserLoginDto model)
-        {
-            var userDb = await _userManager.FindByNameAsync(model.UserName);
-
-            if (userDb != null)
-            {
-                var passwordCheck = await _signinManager.CheckPasswordSignInAsync(userDb, model.Password, false);
-
-                if (passwordCheck.Succeeded)
-                {
-                    var claims = new List<Claim>();
-                    claims.Add(new Claim(JwtRegisteredClaimNames.NameId, userDb.Id));
-                    claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, userDb.UserName));
-                    claims.Add(new Claim(JwtRegisteredClaimNames.Email, userDb.Email));
-
-                    var roles = await _userManager.GetRolesAsync(userDb);
-                    claims.AddRange(roles.Select(r => new Claim("role", r)));
-
-                    var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["Token:Key"]));
-                    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                    
-                    var token = new JwtSecurityToken(
-                        _config["Token:Issuer"],
-                        _config["Token:Audience"],
-                        claims,
-                        expires: DateTime.Now.AddHours(3),
-                        signingCredentials: credentials
-                    );
-
-                    return Ok(new {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                    });
-                }
-            }
-
-            return Unauthorized("Invalid signing credentials.");
         }
 
         [HttpPost("Register")]
         public async Task<IActionResult> Register(UserRegisterDto model)
         {
-            var userDb = await _userManager.FindByNameAsync(model.UserName);
+            var userDb = await _repo.FindByUserNameAsync(model.UserName);
 
             if (userDb == null)
             {
                 var user = _mapper.Map<User>(model);
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await _repo.CreateUserAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, RoleText.User);
+                    await _repo.AddToRoleAsync(user, RoleText.User);
                     var userDetail = _mapper.Map<UserDetailDto>(user);
 
                     return CreatedAtRoute("", userDetail);
@@ -94,6 +53,67 @@ namespace AuthDemo.Controllers
             }
 
             return BadRequest();
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(UserLoginDto model)
+        {
+            var userDb = await _repo.FindByUserNameAsync(model.UserName);
+
+            if (userDb != null)
+            {
+                var passwordCheck = await _repo.CheckPasswordAsync(userDb, model.Password);
+
+                if (passwordCheck.Succeeded)
+                {
+                    var claims = await RenderClaims(userDb);
+                    var credentials = RenderCredentials();
+                    var token = RenderToken(claims, credentials);
+
+                    return Ok(token);
+                }
+            }
+
+            return Unauthorized("Invalid signing credentials.");
+        }
+
+        private async Task<List<Claim>> RenderClaims(User userDb)
+        {
+            var claims = new List<Claim>();
+            claims.Add(new Claim(JwtRegisteredClaimNames.NameId, userDb.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, userDb.UserName));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, userDb.Email));
+
+            var roles = await _repo.GetRolesAsync(userDb);
+            claims.AddRange(roles.Select(r => new Claim("role", r)));
+
+            return claims;
+        }
+
+        private SigningCredentials RenderCredentials()
+        {
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_config["Token:Key"]));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            return credentials;
+        }
+
+        
+        private object RenderToken(List<Claim> claims, SigningCredentials credentials)
+        {
+            var token = new JwtSecurityToken(
+                _config["Token:Issuer"],
+                _config["Token:Audience"],
+                claims,
+                expires: DateTime.Now.AddHours(3),
+                signingCredentials: credentials
+            );
+
+            return new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                validTo = token.ValidTo
+            };
         }
     }
 }

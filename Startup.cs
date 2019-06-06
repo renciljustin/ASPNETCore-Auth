@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AuthDemo.Core;
 using AuthDemo.Data;
 using AuthDemo.Data.Models;
 using AuthDemo.Data.Seeds;
@@ -54,6 +55,7 @@ namespace AuthDemo
                 opt.AddPolicy(PolicyText.RequiresUser, p => p.RequireRole(RoleText.User, RoleText.User));
             });
             services.AddTransient<SeedUsersAndRoles>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
