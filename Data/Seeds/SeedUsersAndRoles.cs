@@ -18,7 +18,7 @@ namespace AuthDemo.Data.Seeds
         public void BeginSeeding()
         {
             SeedRoles();
-            //SeedUsers();
+            SeedUsers();
         }
 
         private void SeedRoles()
