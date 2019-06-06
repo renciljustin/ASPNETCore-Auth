@@ -23,19 +23,19 @@ namespace AuthDemo.Data.Seeds
 
         private void SeedRoles()
         {
-            if (!_roleManager.RoleExistsAsync(RoleText.ADMIN).Result)
+            if (!_roleManager.RoleExistsAsync(RoleText.Admin).Result)
             {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.ADMIN }).Result;
+                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.Admin }).Result;
             }
 
-            if (!_roleManager.RoleExistsAsync(RoleText.MODERATOR).Result)
+            if (!_roleManager.RoleExistsAsync(RoleText.Moderator).Result)
             {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.MODERATOR }).Result;
+                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.Moderator }).Result;
             }
 
-            if (!_roleManager.RoleExistsAsync(RoleText.USER).Result)
+            if (!_roleManager.RoleExistsAsync(RoleText.User).Result)
             {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.USER }).Result;
+                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.User }).Result;
             }
         }
 
@@ -59,7 +59,7 @@ namespace AuthDemo.Data.Seeds
                 if (!result.Succeeded)
                     return;
 
-                _userManager.AddToRolesAsync(userToCreate, new string[]{ RoleText.ADMIN, RoleText.MODERATOR }).Wait();
+                _userManager.AddToRolesAsync(userToCreate, new string[]{ RoleText.Admin, RoleText.Moderator }).Wait();
             }
 
             const string userEmail = "johndoe@domain.com";
@@ -79,7 +79,7 @@ namespace AuthDemo.Data.Seeds
                 if (!result.Succeeded)
                     return;
 
-                _userManager.AddToRoleAsync(userToCreate, RoleText.USER).Wait();
+                _userManager.AddToRoleAsync(userToCreate, RoleText.User).Wait();
             }
         }
     }

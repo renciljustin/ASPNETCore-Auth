@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AuthDemo.Data;
 using AuthDemo.Data.Models;
 using AuthDemo.Data.Seeds;
+using AuthDemo.Shared;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,11 @@ namespace AuthDemo
                         ValidateIssuerSigningKey = true
                     };
                 });
+            services.AddAuthorization(opt => {
+                opt.AddPolicy(PolicyText.RequiresAdmin, p => p.RequireRole(RoleText.Admin));
+                opt.AddPolicy(PolicyText.RequiresModerator, p => p.RequireRole(RoleText.Moderator));
+                opt.AddPolicy(PolicyText.RequiresUser, p => p.RequireRole(RoleText.User, RoleText.User));
+            });
             services.AddTransient<SeedUsersAndRoles>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

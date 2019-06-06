@@ -2,8 +2,8 @@ namespace AuthDemo.Shared
 {
     public static class RoleText
     {
-        public const string ADMIN = "Admin";
-        public const string MODERATOR = "Moderator";
-        public const string USER = "User";
+        public const string Admin = "Admin";
+        public const string Moderator = "Moderator";
+        public const string User = "User";
     }
 }

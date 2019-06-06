@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthDemo.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthDemo.Controllers
@@ -11,12 +13,14 @@ namespace AuthDemo.Controllers
     public class ValuesController : ControllerBase
     {
         // GET api/values
+        [Authorize(Policy = PolicyText.RequiresAdmin)]
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
+        [Authorize(Policy = PolicyText.RequiresUser)]
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)

@@ -86,7 +86,7 @@ namespace AuthDemo.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, RoleText.USER);
+                    await _userManager.AddToRoleAsync(user, RoleText.User);
                     var userDetail = _mapper.Map<UserDetailDto>(user);
 
                     return CreatedAtRoute("", userDetail);
