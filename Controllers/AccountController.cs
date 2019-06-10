@@ -39,20 +39,19 @@ namespace API.Controllers
         {
             var userDb = await _repo.FindByUserNameAsync(model.UserName);
 
-            if (userDb == null)
-            {
-                var user = _mapper.Map<User>(model);
-                var result = await _repo.CreateUserAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _repo.AddToRoleAsync(user, RoleText.User);
-                    var userDetail = _mapper.Map<UserDetailDto>(user);
+            if (userDb != null)
+                return BadRequest("Username is already used.");
 
-                    return CreatedAtRoute("", userDetail);
-                }
-            }
+            var user = _mapper.Map<User>(model);
+            var result = await _repo.CreateUserAsync(user, model.Password);
 
-            return BadRequest();
+            if (!result.Succeeded)
+                return BadRequest("Registration Failed.");
+
+            await _repo.AddToRoleAsync(user, RoleText.User);
+            var userDetail = _mapper.Map<UserDetailDto>(user);
+
+            return CreatedAtRoute("", userDetail);
         }
 
         [HttpPost("Login")]
@@ -60,21 +59,19 @@ namespace API.Controllers
         {
             var userDb = await _repo.FindByUserNameAsync(model.UserName);
 
-            if (userDb != null)
-            {
-                var passwordCheck = await _repo.CheckPasswordAsync(userDb, model.Password);
+            if (userDb == null)
+                return Unauthorized("Invalid username.");
 
-                if (passwordCheck.Succeeded)
-                {
-                    var claims = await RenderClaims(userDb);
-                    var credentials = RenderCredentials();
-                    var token = RenderToken(claims, credentials);
+            var passwordCheck = await _repo.CheckPasswordAsync(userDb, model.Password);
 
-                    return Ok(token);
-                }
-            }
+            if (!passwordCheck.Succeeded)
+                return Unauthorized("Invalid password.");
 
-            return Unauthorized("Invalid signing credentials.");
+            var claims = await RenderClaims(userDb);
+            var credentials = RenderCredentials();
+            var token = RenderToken(claims, credentials);
+
+            return Ok(token);
         }
 
         private async Task<List<Claim>> RenderClaims(User userDb)
