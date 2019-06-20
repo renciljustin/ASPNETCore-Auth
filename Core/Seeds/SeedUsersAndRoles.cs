@@ -11,9 +11,9 @@ namespace API.Core.Seeds
 {
     public class SeedUsersAndRoles
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly UserManager<User> _userManager;
-        public SeedUsersAndRoles(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public SeedUsersAndRoles(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -30,7 +30,7 @@ namespace API.Core.Seeds
             if (!_roleManager.Roles.Any())
             {
                 var data = File.ReadAllText("Core/Seeds/roles.json");
-                var roles = JsonConvert.DeserializeObject<List<IdentityRole>>(data);
+                var roles = JsonConvert.DeserializeObject<List<Role>>(data);
 
                 foreach (var role in roles)
                 {

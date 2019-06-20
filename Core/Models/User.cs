@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
@@ -16,5 +17,7 @@ namespace API.Core.Models
 
         [DataType(DataType.Date)]
         public DateTime? BirthDate { get; set; }
+
+        public ICollection<UserRole> Roles { get; set; }
     }
 }
