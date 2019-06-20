@@ -1,9 +1,9 @@
 using System;
-using API.Data.Models;
+using API.Core.Models;
 using API.Shared;
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Data.Seeds
+namespace API.Core.Seeds
 {
     public class SeedUsersAndRoles
     {

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace API.Data.Dtos
+namespace API.Persistence.Dtos
 {
     public class UserRegisterDto
     {

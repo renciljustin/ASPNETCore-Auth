@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Data.Models
+namespace API.Core.Models
 {
     public class User : IdentityUser
     {

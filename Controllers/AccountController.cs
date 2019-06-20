@@ -6,11 +6,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using API.Core;
-using API.Data.Dtos;
-using API.Data.Models;
+using API.Persistence.Dtos;
+using API.Core.Models;
 using API.Shared;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -95,7 +94,6 @@ namespace API.Controllers
             return credentials;
         }
 
-        
         private object RenderToken(List<Claim> claims, SigningCredentials credentials)
         {
             var token = new JwtSecurityToken(

@@ -1,5 +1,5 @@
-using API.Data.Dtos;
-using API.Data.Models;
+using API.Persistence.Dtos;
+using API.Core.Models;
 using AutoMapper;
 
 namespace API.Mapping

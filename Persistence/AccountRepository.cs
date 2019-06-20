@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using API.Core;
-using API.Data.Models;
+using API.Core.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace API.Data
+namespace API.Persistence
 {
     public class AccountRepository : IAccountRepository
     {

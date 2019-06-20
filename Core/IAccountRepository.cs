@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.Data.Models;
+using API.Core.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Core

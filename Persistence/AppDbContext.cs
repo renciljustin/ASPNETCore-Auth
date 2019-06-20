@@ -1,8 +1,8 @@
-using API.Data.Models;
+using API.Core.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace API.Data
+namespace API.Persistence
 {
     public class AppDbContext : IdentityDbContext<User>
     {
