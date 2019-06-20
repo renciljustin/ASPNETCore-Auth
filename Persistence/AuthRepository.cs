@@ -32,6 +32,11 @@ namespace API.Persistence
             return await _userManager.CreateAsync(user, password);
         }
 
+        public async Task<User> FindByIdAsync(string id)
+        {
+            return await _userManager.FindByIdAsync(id);
+        }
+
         public async Task<User> FindByUserNameAsync(string userName)
         {
             return await _userManager.FindByNameAsync(userName);

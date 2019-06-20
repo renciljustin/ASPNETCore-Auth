@@ -22,16 +22,19 @@ namespace API.Controllers
     {
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        private readonly IAuthRepository _repo;
+        private readonly IAuthRepository _authRepo;
+        private readonly IRefreshTokenRepository _tokenRepo;
         private readonly IUnitOfWork _uow;
 
         public AuthController(IConfiguration config,
-            IAuthRepository repo,
+            IAuthRepository authRepo,
+            IRefreshTokenRepository tokenRepo,
             IUnitOfWork uow,
             IMapper mapper)
         {
             _config = config;
-            _repo = repo;
+            _authRepo = authRepo;
+            _tokenRepo = tokenRepo;
             _uow = uow;
             _mapper = mapper;
         }
@@ -39,18 +42,18 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDto model)
         {
-            var userDb = await _repo.FindByUserNameAsync(model.UserName);
+            var userDb = await _authRepo.FindByUserNameAsync(model.UserName);
 
             if (userDb != null)
                 return BadRequest("Username is already used.");
 
             var user = _mapper.Map<User>(model);
-            var result = await _repo.CreateUserAsync(user, model.Password);
+            var result = await _authRepo.CreateUserAsync(user, model.Password);
 
             if (!result.Succeeded)
                 return BadRequest("Registration Failed.");
 
-            await _repo.AddToRoleAsync(user, RoleText.User);
+            await _authRepo.AddToRoleAsync(user, RoleText.User);
             var userDetail = _mapper.Map<UserDetailDto>(user);
 
             return CreatedAtRoute("", userDetail);
@@ -59,27 +62,77 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto model)
         {
-            var userDb = await _repo.FindByUserNameAsync(model.UserName);
+            var userDb = await _authRepo.FindByUserNameAsync(model.UserName);
 
             if (userDb == null)
                 return Unauthorized("Invalid username.");
 
-            var passwordCheck = await _repo.CheckPasswordAsync(userDb, model.Password);
+            var passwordCheck = await _authRepo.CheckPasswordAsync(userDb, model.Password);
 
             if (!passwordCheck.Succeeded)
                 return Unauthorized("Invalid password.");
 
-            var token = await RenderTokenAsync(userDb);
+            var accessToken = await CreateAccessTokenAsync(userDb);
+            var refreshToken = await CreateRefreshTokenAsync(userDb.Id);
+            
+            await _uow.CompleteAsync();
 
-            return Ok(token);
+            return Ok(new {
+                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                refreshToken = refreshToken.Value
+            });
         }
 
-        private async Task<JwtSecurityToken> RenderTokenAsync(User user)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromForm] string refreshToken)
+        {
+            var refreshTokenDb = await _tokenRepo.FindByValueAsync(refreshToken);
+
+            if (refreshTokenDb is null)
+                return NotFound("Refresh Token not found.");
+
+            _tokenRepo.RevokeToken(refreshTokenDb);
+            await _uow.CompleteAsync();
+
+            return Ok();
+        }
+
+        [HttpPut("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromForm] string refreshToken)
+        {
+            var refreshTokenDb = await _tokenRepo.FindByValueAsync(refreshToken);
+
+            if (refreshTokenDb is null)
+                return NotFound("Refresh Token not found.");
+
+            if (refreshTokenDb.ExpirationDate <= DateTime.UtcNow)
+                return Unauthorized("Refresh Token is expired.");
+
+            var userDb = await _authRepo.FindByIdAsync(refreshTokenDb.UserId);
+
+            if (userDb is null)
+                return NotFound("User not found.");
+
+            _tokenRepo.Refresh(refreshTokenDb);
+
+            var accessToken = await CreateAccessTokenAsync(userDb);
+
+            await _uow.CompleteAsync();
+
+            return Ok(new {
+                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                refreshToken = refreshTokenDb.Value
+            });
+        }
+
+        #region Render Token
+            
+        private async Task<JwtSecurityToken> CreateAccessTokenAsync(User user)
         {
             var claims = await RenderClaimsAsync(user);
             var credentials = RenderCredentials();
 
-            var token = new JwtSecurityToken(
+            var accessToken = new JwtSecurityToken(
                 _config["Token:Issuer"],
                 _config["Token:Audience"],
                 claims,
@@ -87,7 +140,7 @@ namespace API.Controllers
                 signingCredentials: credentials
             );
 
-            return token;
+            return accessToken;
         }
 
         private async Task<List<Claim>> RenderClaimsAsync(User userDb)
@@ -97,7 +150,7 @@ namespace API.Controllers
             claims.Add(new Claim(JwtRegisteredClaimNames.UniqueName, userDb.UserName));
             claims.Add(new Claim(JwtRegisteredClaimNames.Email, userDb.Email));
 
-            var roles = await _repo.GetRolesAsync(userDb);
+            var roles = await _authRepo.GetRolesAsync(userDb);
             claims.AddRange(roles.Select(r => new Claim("role", r)));
 
             return claims;
@@ -110,5 +163,15 @@ namespace API.Controllers
 
             return credentials;
         }
+
+        private async Task<RefreshToken> CreateRefreshTokenAsync(string userId)
+        {
+            var refreshToken = _tokenRepo.CreateRefreshToken(userId);
+            await _uow.CompleteAsync();
+
+            return refreshToken;
+        }
+
+        #endregion
     }
 }
