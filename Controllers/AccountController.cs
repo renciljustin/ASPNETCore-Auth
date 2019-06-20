@@ -18,14 +18,14 @@ namespace API.Controllers
 {
     [ApiController]
     [Route(RouteText.API)]
-    public class AccountController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAccountRepository _repo;
         private readonly IUnitOfWork _uow;
 
-        public AccountController(IConfiguration config,
+        public AuthController(IConfiguration config,
             IAccountRepository repo,
             IUnitOfWork uow,
             IMapper mapper)
