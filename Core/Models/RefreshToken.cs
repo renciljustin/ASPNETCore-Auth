@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,6 +15,9 @@ namespace API.Core.Models
 
         [Required]
         public string Value { get; set; }
+
+        [Required]
+        public DateTime ExpirationDate { get; set; }
 
         [Required]
         public int TotalRefresh { get; set; }
