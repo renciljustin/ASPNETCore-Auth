@@ -1,0 +1,23 @@
+[
+    {
+        "userName": "Rencil",
+        "email": "rencil@domain.com",
+        "firstName": "Rencil Justin",
+        "lastName": "Evangelista",
+        "birthDate": "1994-10-28"
+    },
+    {
+        "userName": "Faye",
+        "email": "faye@domain.com",
+        "firstName": "Richelle Faye",
+        "lastName": "Margarejo",
+        "birthDate": "1998-03-31"
+    },
+    {
+        "userName": "John",
+        "email": "john@domain.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "birthDate": "1990-01-01"
+    },
+]

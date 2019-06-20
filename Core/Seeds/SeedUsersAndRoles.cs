@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using API.Core.Models;
 using API.Shared;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace API.Core.Seeds
 {
@@ -23,63 +27,40 @@ namespace API.Core.Seeds
 
         private void SeedRoles()
         {
-            if (!_roleManager.RoleExistsAsync(RoleText.Admin).Result)
+            if (!_roleManager.Roles.Any())
             {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.Admin }).Result;
-            }
+                var data = File.ReadAllText("Core/Seeds/roles.json");
+                var roles = JsonConvert.DeserializeObject<List<IdentityRole>>(data);
 
-            if (!_roleManager.RoleExistsAsync(RoleText.Moderator).Result)
-            {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.Moderator }).Result;
-            }
-
-            if (!_roleManager.RoleExistsAsync(RoleText.User).Result)
-            {
-                var result = _roleManager.CreateAsync(new IdentityRole { Name = RoleText.User }).Result;
+                foreach (var role in roles)
+                {
+                    _roleManager.CreateAsync(role).Wait();
+                }
             }
         }
 
         private void SeedUsers()
         {
-            const string adminEmail = "rencil@domain.com";
-
-            if (_userManager.FindByEmailAsync(adminEmail).Result == null)
+            if (!_userManager.Users.Any())
             {
-                var userToCreate = new User
+                var data = File.ReadAllText("Core/Seeds/users.json");
+                var users = JsonConvert.DeserializeObject<List<User>>(data);
+
+                var roles = _roleManager.Roles.ToList();
+                var roleIdx = 0;
+
+                foreach (var user in users)
                 {
-                    UserName = "Rencil",
-                    FirstName = "Rencil Justin",
-                    LastName = "Evangelista",
-                    BirthDate = new DateTime(2018, 10, 28),
-                    Email = "rencil@domain.com"
-                };
+                    var result = _userManager.CreateAsync(user, "P@ssw0rd").Result;
 
-                var result = _userManager.CreateAsync(userToCreate, "P@ssw0rd").Result;
+                    if (result.Succeeded)
+                    {
+                        _userManager.AddToRoleAsync(user, roles[roleIdx].Name).Wait();
 
-                if (!result.Succeeded)
-                    return;
-
-                _userManager.AddToRolesAsync(userToCreate, new string[]{ RoleText.Admin, RoleText.Moderator }).Wait();
-            }
-
-            const string userEmail = "johndoe@domain.com";
-
-            if (_userManager.FindByEmailAsync(userEmail).Result == null)
-            {
-                var userToCreate = new User
-                {
-                    UserName = "John",
-                    FirstName = "John",
-                    LastName = "Doe",
-                    Email = "johndoe@domain.com"
-                };
-
-                var result = _userManager.CreateAsync(userToCreate, "P@ssw0rd").Result;
-
-                if (!result.Succeeded)
-                    return;
-
-                _userManager.AddToRoleAsync(userToCreate, RoleText.User).Wait();
+                        if (roleIdx + 1 != roles.Count())
+                            roleIdx++;
+                    }
+                }
             }
         }
     }
