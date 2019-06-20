@@ -83,7 +83,7 @@ namespace API.Controllers
                 _config["Token:Issuer"],
                 _config["Token:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: credentials
             );
 

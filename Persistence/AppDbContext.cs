@@ -7,6 +7,8 @@ namespace API.Persistence
 {
     public class AppDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>, UserRole, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
             
