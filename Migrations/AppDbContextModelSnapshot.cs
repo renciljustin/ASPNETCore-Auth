@@ -26,6 +26,8 @@ namespace API.Migrations
 
                     b.Property<DateTime?>("CreationTime");
 
+                    b.Property<DateTime>("ExpirationDate");
+
                     b.Property<bool?>("Flag");
 
                     b.Property<DateTime?>("LastModified");

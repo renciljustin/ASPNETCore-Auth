@@ -69,7 +69,7 @@ namespace API
 
             services.AddTransient<SeedUsersAndRoles>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

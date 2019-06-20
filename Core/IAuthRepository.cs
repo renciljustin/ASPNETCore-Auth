@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace API.Core
 {
-    public interface IAccountRepository
+    public interface IAuthRepository
     {
-         Task<User> FindByUserNameAsync(string userName);
-         Task<SignInResult> CheckPasswordAsync(User user, string password);
-         Task<IEnumerable<string>> GetRolesAsync(User user);
-         Task<IdentityResult> CreateUserAsync(User user, string password);
          Task<IdentityResult> AddToRoleAsync(User user, string role);
+         Task<SignInResult> CheckPasswordAsync(User user, string password);
+         Task<IdentityResult> CreateUserAsync(User user, string password);
+         Task<User> FindByUserNameAsync(string userName);
+         Task<IEnumerable<string>> GetRolesAsync(User user);
     }
 }

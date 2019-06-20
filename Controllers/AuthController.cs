@@ -22,11 +22,11 @@ namespace API.Controllers
     {
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        private readonly IAccountRepository _repo;
+        private readonly IAuthRepository _repo;
         private readonly IUnitOfWork _uow;
 
         public AuthController(IConfiguration config,
-            IAccountRepository repo,
+            IAuthRepository repo,
             IUnitOfWork uow,
             IMapper mapper)
         {
