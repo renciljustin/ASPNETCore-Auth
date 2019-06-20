@@ -23,17 +23,20 @@ namespace API.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAccountRepository _repo;
+        private readonly IUnitOfWork _uow;
 
         public AccountController(IConfiguration config,
             IAccountRepository repo,
+            IUnitOfWork uow,
             IMapper mapper)
         {
-            _repo = repo;
             _config = config;
+            _repo = repo;
+            _uow = uow;
             _mapper = mapper;
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDto model)
         {
             var userDb = await _repo.FindByUserNameAsync(model.UserName);
@@ -53,7 +56,7 @@ namespace API.Controllers
             return CreatedAtRoute("", userDetail);
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto model)
         {
             var userDb = await _repo.FindByUserNameAsync(model.UserName);
@@ -66,14 +69,28 @@ namespace API.Controllers
             if (!passwordCheck.Succeeded)
                 return Unauthorized("Invalid password.");
 
-            var claims = await RenderClaims(userDb);
-            var credentials = RenderCredentials();
-            var token = RenderToken(claims, credentials);
+            var token = await RenderTokenAsync(userDb);
 
             return Ok(token);
         }
 
-        private async Task<List<Claim>> RenderClaims(User userDb)
+        private async Task<JwtSecurityToken> RenderTokenAsync(User user)
+        {
+            var claims = await RenderClaimsAsync(user);
+            var credentials = RenderCredentials();
+
+            var token = new JwtSecurityToken(
+                _config["Token:Issuer"],
+                _config["Token:Audience"],
+                claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials
+            );
+
+            return token;
+        }
+
+        private async Task<List<Claim>> RenderClaimsAsync(User userDb)
         {
             var claims = new List<Claim>();
             claims.Add(new Claim(JwtRegisteredClaimNames.NameId, userDb.Id));
@@ -92,23 +109,6 @@ namespace API.Controllers
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
             return credentials;
-        }
-
-        private object RenderToken(List<Claim> claims, SigningCredentials credentials)
-        {
-            var token = new JwtSecurityToken(
-                _config["Token:Issuer"],
-                _config["Token:Audience"],
-                claims,
-                expires: DateTime.Now.AddHours(3),
-                signingCredentials: credentials
-            );
-
-            return new
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                validTo = token.ValidTo
-            };
         }
     }
 }
