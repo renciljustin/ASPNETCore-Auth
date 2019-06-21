@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using API.Core;
 using API.Persistence.Dtos;
 using API.Core.Models;
-using API.Shared;
+using API.Shared.Enums;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace API.Controllers
 {
     [ApiController]
-    [Route(RouteText.API)]
+    [Route(RoutePrefix.API)]
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -53,7 +53,7 @@ namespace API.Controllers
             if (!result.Succeeded)
                 return BadRequest("Registration Failed.");
 
-            await _authRepo.AddToRoleAsync(user, RoleText.User);
+            await _authRepo.AddToRoleAsync(user, RolePrefix.User);
             var userDetail = _mapper.Map<UserDetailDto>(user);
 
             return CreatedAtRoute("", userDetail);

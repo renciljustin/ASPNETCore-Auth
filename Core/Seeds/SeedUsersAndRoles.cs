@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using API.Core.Models;
-using API.Shared;
+using API.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 

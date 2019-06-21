@@ -4,7 +4,7 @@ using API.Core;
 using API.Persistence;
 using API.Core.Models;
 using API.Core.Seeds;
-using API.Shared;
+using API.Shared.Enums;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -63,9 +63,9 @@ namespace API
             });
 
             services.AddAuthorization(opt => {
-                opt.AddPolicy(PolicyText.RequiresAdmin, p => p.RequireRole(RoleText.Admin));
-                opt.AddPolicy(PolicyText.RequiresModerator, p => p.RequireRole(RoleText.Moderator));
-                opt.AddPolicy(PolicyText.RequiresUser, p => p.RequireRole(RoleText.User, RoleText.User));
+                opt.AddPolicy(PolicyPrefix.RequiresAdmin, p => p.RequireRole(RolePrefix.Admin));
+                opt.AddPolicy(PolicyPrefix.RequiresModerator, p => p.RequireRole(RolePrefix.Moderator));
+                opt.AddPolicy(PolicyPrefix.RequiresUser, p => p.RequireRole(RolePrefix.User, RolePrefix.User));
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

@@ -1,6 +1,6 @@
-namespace API.Shared
+namespace API.Shared.Enums
 {
-    public static class RoleText
+    public static class RolePrefix
     {
         public const string Admin = "Admin";
         public const string Moderator = "Moderator";

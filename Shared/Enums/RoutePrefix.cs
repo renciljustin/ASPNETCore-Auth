@@ -1,6 +1,6 @@
-namespace API.Shared
+namespace API.Shared.Enums
 {
-    public static class RouteText
+    public static class RoutePrefix
     {
         public const string API = "api/[controller]";
     }
