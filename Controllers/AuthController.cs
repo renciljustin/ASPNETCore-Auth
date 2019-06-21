@@ -47,16 +47,23 @@ namespace API.Controllers
             if (userDb != null)
                 return BadRequest("Username is already used.");
 
-            var user = _mapper.Map<User>(model);
-            var result = await _authRepo.CreateUserAsync(user, model.Password);
+            var userToCreate = _mapper.Map<User>(model);
+            var result = await _authRepo.CreateUserAsync(userToCreate, model.Password);
 
             if (!result.Succeeded)
                 return BadRequest("Registration Failed.");
 
-            await _authRepo.AddToRoleAsync(user, RolePrefix.User);
-            var userDetail = _mapper.Map<UserDetailDto>(user);
+            await _authRepo.AddToRoleAsync(userToCreate, RolePrefix.User);
 
-            return CreatedAtRoute("", userDetail);
+            var accessToken = await CreateAccessTokenAsync(userToCreate);
+            var refreshToken = await CreateRefreshTokenAsync(userToCreate.Id);
+
+            await _uow.CompleteAsync();
+
+            return CreatedAtRoute("", new {
+                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                refreshToken = refreshToken.Value
+            });
         }
 
         [HttpPost("login")]
