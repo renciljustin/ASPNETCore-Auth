@@ -47,17 +47,20 @@ namespace API
             
             services.AddIdentity<User, Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
             
-            services.AddAuthentication(opt => opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt => {
-                    opt.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidIssuer = Configuration["Token:Issuer"],
-                        ValidAudience = Configuration["Token:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Token:Key"])),
-                        ValidateIssuerSigningKey = true,
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
+            services.AddAuthentication(opt => {
+                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(opt => {
+                opt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = Configuration["Token:Issuer"],
+                    ValidAudience = Configuration["Token:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["Token:Key"])),
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             services.AddAuthorization(opt => {
                 opt.AddPolicy(PolicyText.RequiresAdmin, p => p.RequireRole(RoleText.Admin));
